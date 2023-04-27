@@ -32,7 +32,7 @@ from ontopy.utils import write_catalog
 
 from labop_device_ontology.emmo_utils import en, pl
 
-from owlready2 import DatatypeProperty, FunctionalProperty, ObjectProperty, AllDisjoint
+from owlready2 import DatatypeProperty, FunctionalProperty, ObjectProperty, AllDisjoint, Thing
 
 from labop_device_ontology import __version__ # Version of this ontology
 from labop_device_ontology.export_ontology import export_ontology
@@ -77,95 +77,55 @@ class LOLabwareTBox:
 
             # device visual representation
             
-            class ModelIcon:
+            class ModelIcon(Thing):
                 """Icon of the device in X format. SVG ?"""
             
 
-            class Model2D:
+            class Model2D(Thing):
                 """2D model of the device in X format. SVG ?"""
 
-            class Model3D:
+            class Model3D(Thing):
                 """3D model of the device in X format. STL ?"""
                 wikipediaEntry = en("https://en.wikipedia.org/wiki/3D_modeling")
 
             
             # AllDisjoint([ModelIcon, Model2D, Model3D])
-           
-           
-            # multiwell device
-            # =================
 
-            class WellVolume(self.emmo.Volume):
-                """Total Device volume """
 
-            class WellDistRow(self.emmo.Length):
-                """wWll-to-well distance in row direction"""
-            
-            class WellDistCol(self.emmo.Length):
-                """"Well-to-well distance in column direction"""
-
-            AllDisjoint([WellVolume, WellDistRow, WellDistCol])
-
-            # Well properties of device with wells
-            class DepthWell(self.emmo.Length):
-                """Well total well depth=hight"""
-            
-            class ShapeWell:
-                """Well overall / top well shape,e.g. round, square, buffeled,..."""
-            
-            class ShapeWellBottom:
-                """Well, bottom shape, flat, round, conical-"""
-
-            class TopRadiusXY(self.emmo.Length):
-                """Well radius of a round well at the top opening in x-y plane."""
-
-            class BottomRadiusXY(self.emmo.Length):
-                """Radius of a round bottom in xy plane / direction."""
-
-            class BottomRadiusZ(self.emmo.Length):
-                """Radius of a round bottom in z (hight) direction."""
-
-            class ConeAngle(self.emmo.Angle):
-                """Opening angle of cone in deg."""
-
-            class ConeDepth(self.emmo.Length):
-                """Depth of cone from beginning of conical shape."""
-
-            class ShapePolygonXY:
+            class ShapePolygonXY(Thing):
                 """Generalized shape polygon for more complex well shapes, in xy plane / direction."""
 
-            class ShapePolygonZ:
+            class ShapePolygonZ(Thing):
                 """Generalized shape polygon for more complex well shapes, in z direction = rotation axis."""
 
-            class ShapeModel2D:
+            class ShapeModel2D(Thing):
                 """2D model of Well shape"""
 
-            class ShapeModel3D:
+            class ShapeModel3D(Thing):
                 """3D model of Well shape"""
 
             class FirstInteractionPosition(self.emmo.Vector):
                 """Position of first interaction point of a pipette tip with a well or a needle with a septum, rel. to the upper left corner of the device. - what about round device?"""
 
 
-            #AllDisjoint([DepthWell, ShapeWell, ShapeWellBottom, TopRadiusXY, BottomRadiusXY, BottomRadiusZ, ConeAngle, ConeDepth, ShapePolygonXY, ShapePolygonZ, ShapeModel2D, ShapeModel3D, FirstInteractionPosition])
-
+           
 
             # Device Vendor related properties
             # =================================
 
-            class Vendor:
+            class Vendor(Thing):
                 """Device Vendor"""
 
-            class VendorProductNumber:
+            class VendorProductNumber(Thing):
                 """Device Vendor Product Number"""
 
             # UNSPSC
-            class UNSPSC:
+            class UNSPSC(Thing):
                 """United Nations Standard Products and Services Code (UNSPSC) for device"""
                 wikipediaEntry = en("https://en.wikipedia.org/wiki/UNSPSC")
 
             # eCl@ss
-            class EClass:
+            class EClass(Thing):
                 """eCl@ss for device"""
                 wikipediaEntry = en("https://en.wikipedia.org/wiki/EClass")
 
@@ -175,8 +135,8 @@ class LOLabwareTBox:
 
             # Basic ------
 
-            class Device(self.lodevt.Device):
-                """Device is a utility device that all experiments are done with and which is not actively measuring. Examples: a container, a pipette tip, a reactor, ... """
+            class Device(self.emmo.Device):
+                """Device is a physical object that is used in a scientific lab, and that is not a consumable. It can be a single object or a set of objects that are used together. """
                 wikipediaEntry = en("https://en.wikipedia.org/wiki/Device")
 
                 # is_a = [self.lodev.has_Material.some(str),
@@ -294,7 +254,6 @@ class LOLabwareTBox:
                 """Septum penetration force"""
 
 
-            # multiwell device
 
             class hasNumCols(Device >> int, FunctionalProperty):
                 """Number of Columns of muti-well device"""
@@ -409,30 +368,23 @@ class LOLabwareTBox:
 
             # isSLAS1-2004compliant
 
-            
-
             # all disjoined properties
 
             # special device classes
             # can be used for faster type testing
-            # ===================================================
 
-            class SLAS_4_2004_96_Well_Plate(Device):
-                """96 Well Microtiter Plate according to SLAS 4-2004 standard"""
-                equivalent_to = [ Device & hasNumCols.value(12) &  hasNumRows.value(8) & hasNumWells.value(96) 
-                                & hasWellVolume.value(100) & hasWellDistRow.value(9) & hasWellDistCol.value(9) 
-                                & hasDepthWell.value(14.5) & hasShapeWell.value("round") & hasShapeWellBottom.value("flat") 
-                                & hasTopRadiusXY.value(4.5) & hasBottomRadiusXY.value(4.5) & hasBottomRadiusZ.value(0) 
-                                & hasConeAngle.value(0) & hasConeDepth.value(0) & hasShapePolygonXY.value(0) 
-                                & hasShapePolygonZ.value(0) & hasShapeModel2D.value("circle") & hasShapeModel3D.value("cylinder") 
-                                & hasScrewCap.value(False) & hasScrewCapMaterial.value("N/A") & hasScrewCapColor.value("N/A") 
-                                & hasColorRGB.value("#FFFFFF") & hasMaterial.value("polystyrene") & hasMass.value(0) 
-                                & hasMaxSheerForce.value(0) & hasCoatingMaterial.value("N/A") & hasSetptum.value(False) 
-                                & hasSeptumMaterial.value("N/A") & hasSeptumPenetrationForce.value(0) & isLiddable.value(False) & isStackable.value(True) 
-                                & isSealable.value(False) & hasManufacturer.value("N/A") & isProductType.value("N/A") & hasModelID.value("N/A") & hasProductID.value("N/A") ]
-                
-            
 
+            # Location of the device
+
+            class Building(self.emmo.Building):
+                pass
+
+            class Laboratory(self.emmo.Laboratory):
+                pass
+
+            class Room(self.emmo.Room):
+                pass
+           
             
 
                 

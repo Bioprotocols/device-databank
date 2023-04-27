@@ -75,7 +75,7 @@ def main():
     lodev = LabwareInterface()
     if args.output_format:
         if args.import_csv is not None:
-            lodev.lodev_abox.import_csv(args.import_csv)
+            #lodev.lodev_abox.import_csv(args.import_csv)
             lodev.export_ontologies(path=args.output_path, format=args.output_format)
     #logging.debug(greeting)
     
